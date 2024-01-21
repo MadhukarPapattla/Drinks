@@ -1,25 +1,79 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from "react";
 import './App.css';
 
+const URL = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=";
+  
+
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+
+    const [drinksData, setDrinksData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [isError, setIsError] = useState({ status: false, msg: "" });
+  
+    const fetchDrink = async (apiURL) => {
+      setLoading(true);
+      setIsError({ status: false, msg: "" });
+      try {
+        const response = await fetch(apiURL);
+        const { drinks } = await response.json();
+        setDrinksData(drinks);
+        setLoading(false);
+        setIsError({ status: false, msg: "" });
+        if (!drinks) {
+          throw new Error("data not found");
+        }
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+        setIsError({
+          status: true,
+          msg: error.message || "something went wrong...",
+        });
+      }
+    };
+  
+    useEffect(() => {
+      const correctURL = `${URL}${searchTerm}`;
+      fetchDrink(correctURL);
+    }, [searchTerm]);
+  
+    return (
+      <div className="Container">
+        <form className="FormEditing">
+          <input className="Editing"
+            type="text"
+            name="search"
+            id="search"
+            placeholder="search something new..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </form>
+  
+        <hr />
+        {loading && !isError?.status && <h3>Loading...</h3>}
+        {isError?.status && <h3 style={{ color: "red" }}>{isError.msg}</h3>}
+        {!loading && !isError?.status && (
+          <ul className="cocktail-data">
+            {drinksData.map((eachDrink) => {
+              const { idDrink, strDrink, strDrinkThumb } = eachDrink;
+              return (
+                <li key={idDrink}>
+                  <div>
+                    <img  className="imgEdit" src={strDrinkThumb} alt={strDrink} />
+                  </div>
+                  <div className="text">
+                    <h3>{strDrink}</h3>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    );
+  };
+  
 
 export default App;
