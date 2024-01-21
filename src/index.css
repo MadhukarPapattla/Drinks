@@ -43,6 +43,8 @@ body {
 
 .imgEdit{
   border-radius: 5px;
+  width: 100%;
+  height: auto;
 }
 .cocktail-data {
   display: grid;
@@ -63,4 +65,14 @@ body {
     gap: 2rem;
     grid-template-columns: 1fr 1fr 1fr;
   }
+}
+@media screen and (min-width: 992px) {
+  .card-container {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+}
+.card {
+  background-color: lightblue;
+  padding: 10px;
 }
